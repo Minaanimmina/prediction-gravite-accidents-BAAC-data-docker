@@ -26,7 +26,7 @@ MODEL_PATH = BASE_DIR / "models" / "best_model_multiclass.joblib"
 # Chemin vers le fichier qui liste les noms des features (colonnes) que le modèle attend
 FEATURES_PATH = BASE_DIR / "models" / "model_features.csv"
 
-# Charge le modèle depuis le fichier (cela peut prendre quelques secondes)
+# Charge le modèle depuis le fichier
 model = joblib.load(MODEL_PATH)
 # Récupère la liste des noms des features à partir du fichier CSV
 model_features = pd.read_csv(FEATURES_PATH)["feature"].tolist()
@@ -97,7 +97,7 @@ def predict(req: PredictRequest):
         # Étape C : Ajoute à la BD
         db.add(db_prediction)
         
-        # Étape D : Valide (commit)
+        # Étape D : Valide
         db.commit()
         
     finally:
@@ -114,7 +114,7 @@ def get_history() -> list[PredictionResponse]:
     db = SessionLocal()
     
     try:
-        # Récupère TOUTES les prédictions depuis la table
+        # Récupère toutes les prédictions depuis la table
         # C'est l'équivalent de : SELECT * FROM predictions
         predictions = db.query(Prediction).all()
         

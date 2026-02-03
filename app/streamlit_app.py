@@ -180,9 +180,9 @@ st.markdown(
     }
 
 
-        /* ==========================================================
-   Uniformiser tous les titres de champs (labels Streamlit)
-   ========================================================== */
+    /* ==========================================================
+        Uniformiser tous les titres de champs (labels Streamlit)
+    ========================================================== */
 
     /* Labels */
     label,
@@ -204,8 +204,8 @@ st.markdown(
     }
 
     /* =========================
-       Alerts
-       ========================= */
+            Alerts
+    ========================= */
     .stAlert {
         background: #fdfdf8 !important;
         border: 1px solid #d3d2ca !important;

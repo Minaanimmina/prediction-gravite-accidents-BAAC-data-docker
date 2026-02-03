@@ -19,7 +19,7 @@ engine = create_engine(DATABASE_URL)
 # Crée une "session"
 SessionLocal = sessionmaker(bind=engine)
 
-# Base pour tous tes modèles
+# Base pour tous les modèles
 Base = declarative_base()
 
 # Fonction pour créer toutes les tables automatiquement
