@@ -1,4 +1,9 @@
 __pycache__/
 .ipynb_checkpoints/
 .env
-./notebooks/catboost_info
+catboost_info/
+**/catboost_info/
+*.pyc
+.venv/
+virtual_documents/
+data/raw/

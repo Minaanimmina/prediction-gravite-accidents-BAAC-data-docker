@@ -1,58 +1,76 @@
+# Importe les outils nécessaires pour créer l'API
 from fastapi import FastAPI
+# Pydantic permet de vérifier que les données reçues sont du bon type
 from pydantic import BaseModel
+# pandas et joblib sont utilisés pour traiter les données et charger le modèle
 import pandas as pd
 import joblib
 from pathlib import Path
 
+# Crée l'application API FastAPI
 app = FastAPI(title="Accidents Gravité API")
 
+# Définit le chemin de base du projet (remonte de deux niveaux depuis ce fichier)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Chemin vers le modèle d'IA entraîné
 MODEL_PATH = BASE_DIR / "models" / "best_model_multiclass.joblib"
+# Chemin vers le fichier qui liste les noms des features (colonnes) que le modèle attend
 FEATURES_PATH = BASE_DIR / "models" / "model_features.csv"
 
+# Charge le modèle depuis le fichier (cela peut prendre quelques secondes)
 model = joblib.load(MODEL_PATH)
+# Récupère la liste des noms des features à partir du fichier CSV
 model_features = pd.read_csv(FEATURES_PATH)["feature"].tolist()
 
 
+# Classe qui définit la structure des données attendues lors d'une requête de prédiction
 class PredictRequest(BaseModel):
-    # On accepte un dictionnaire de features
-    # Exemple JSON : {"vitesse_max_auto_clean": 50, "acc_est_en_agglo": 1, ...}
+    # La requête doit contenir un dictionnaire appelé "features"
+    # Exemple : {"vitesse_max_auto_clean": 50, "acc_est_en_agglo": 1, ...}
     features: dict
 
 
+# Endpoint (point d'accès) pour vérifier que l'API fonctionne
 @app.get("/health")
 def health():
+    # Retourne un message simple indiquant que l'API est en ligne
     return {"status": "ok"}
 
 
+# Endpoint pour faire une prédiction
 @app.post("/predict")
 def predict(req: PredictRequest):
-    # Créer un DataFrame avec 1 ligne
+    # Crée un tableau pandas contenant les features envoyées par l'utilisateur
     X = pd.DataFrame([req.features])
 
-    # Ajouter les features manquantes (si l'utilisateur n'a pas tout fourni)
+    # Ajoute les features manquantes avec une valeur 0 si l'utilisateur ne les a pas envoyées
     for col in model_features:
         if col not in X.columns:
             X[col] = 0
 
-    # Garder uniquement les colonnes attendues et dans le bon ordre
+    # Garde uniquement les colonnes que le modèle attend, dans le bon ordre
     X = X[model_features]
 
-    # Prédiction
+    # Fait la prédiction avec le modèle
+    # pred sera 0, 1 ou 2
     pred = model.predict(X)[0]
 
-    # Comme le modèle est entraîné sur y_enc (0/1/2), on remonte en 1/2/3
+    # Convertit la prédiction de 0/1/2 en 1/2/3 (car c'est ce que les utilisateurs attendent)
     pred_grav = int(pred) + 1
 
-    # Probabilités (si disponible)
+    # Initialise la variable pour les probabilités
     proba = None
+    # Si le modèle peut donner des probabilités (confiance dans sa prédiction)
     if hasattr(model, "predict_proba"):
+        # Récupère les probabilités pour chaque classe
         p = model.predict_proba(X)[0]  # ex: [p0, p1, p2]
+        # Les convertit en dictionnaire plus lisible
         proba = {
             "grav_1": float(p[0]),
             "grav_2": float(p[1]),
             "grav_3": float(p[2])
         }
 
+    # Retourne la prédiction et les probabilités au client
     return {"prediction": pred_grav, "proba": proba}

@@ -1,0 +1,36 @@
+# Fichiers Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# Données brutes
+data/raw/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+docs/
+README.md
+
+# IDE
+.vscode/
+.idea/
+
+# Notebooks
+notebooks/
+
+# OS
+.DS_Store
+Thumbs.db

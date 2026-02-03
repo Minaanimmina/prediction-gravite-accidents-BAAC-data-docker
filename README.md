@@ -66,7 +66,6 @@ Les fichiers CSV doivent être placés dans le dossier :
 
 data/raw/<année>/
 
-
 ## Modélisation
 
 - Problème : **classification multiclasse**
