@@ -16,12 +16,19 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pandas>=2.0 \
     joblib>=1.3 \
     lightgbm>=4.0 \
-    scikit-learn>=1.3
+    scikit-learn>=1.3 \
+    sqlalchemy>=2.0 \
+    psycopg2-binary>=2.9 \
+    python-dotenv>=1.0
 
-# Copie le code et les données
+# Copie le code
+COPY api/main.py .
+COPY api/database.py .
+COPY api/models.py .
+COPY api/schemas.py .
+COPY api/__init__.py .
 COPY models /models
 COPY data/processed /data/processed
-COPY api/main.py .
 
 EXPOSE 8000
 

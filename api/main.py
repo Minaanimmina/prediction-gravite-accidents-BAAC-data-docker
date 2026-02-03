@@ -6,9 +6,17 @@ from pydantic import BaseModel
 import pandas as pd
 import joblib
 from pathlib import Path
+# Pour la base de données
+from database import SessionLocal, init_db
+from models import Prediction
+from schemas import PredictionCreate, PredictionResponse
 
 # Crée l'application API FastAPI
 app = FastAPI(title="Accidents Gravité API")
+
+# Initialise la BD au démarrage de l'app
+# Cela crée la table "predictions" si elle n'existe pas
+init_db()
 
 # Définit le chemin de base du projet (remonte de deux niveaux depuis ce fichier)
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -71,6 +79,48 @@ def predict(req: PredictRequest):
             "grav_2": float(p[1]),
             "grav_3": float(p[2])
         }
+    
+    # Enregistrer en BD
+    # Étape A : Crée une session BD
+    db = SessionLocal()
+    
+    try:
+        # Étape B : Crée une instance Prediction pour enregistrer
+        db_prediction = Prediction(
+            features_json=req.features,
+            prediction=pred_grav,
+            proba_grav1=proba["grav_1"] if proba else 0,
+            proba_grav2=proba["grav_2"] if proba else 0,
+            proba_grav3=proba["grav_3"] if proba else 0
+        )
+        
+        # Étape C : Ajoute à la BD
+        db.add(db_prediction)
+        
+        # Étape D : Valide (commit)
+        db.commit()
+        
+    finally:
+        # Étape E : Ferme la session
+        db.close()
 
     # Retourne la prédiction et les probabilités au client
     return {"prediction": pred_grav, "proba": proba}
+
+# Endpoint pour récupérer l'historique de toutes les prédictions
+@app.get("/history")
+def get_history() -> list[PredictionResponse]:
+    # Crée une session BD
+    db = SessionLocal()
+    
+    try:
+        # Récupère TOUTES les prédictions depuis la table
+        # C'est l'équivalent de : SELECT * FROM predictions
+        predictions = db.query(Prediction).all()
+        
+        # Retourne la liste (Pydantic va les convertir en PredictionResponse)
+        return predictions
+        
+    finally:
+        # Ferme la session
+        db.close()
