@@ -30,6 +30,13 @@ COPY api/__init__.py .
 COPY models /models
 COPY data/processed /data/processed
 
+# Crée un utilisateur non-root pour la sécurité
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
+
+# Change vers l'utilisateur non-root
+USER appuser
+
 EXPOSE 8000
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

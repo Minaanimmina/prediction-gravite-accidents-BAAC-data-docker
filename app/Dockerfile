@@ -12,6 +12,13 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copie le code
 COPY app/streamlit_app.py .
 
+# Crée un utilisateur non-root pour la sécurité
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
+
+# Change vers l'utilisateur non-root
+USER appuser
+
 EXPOSE 8501
 
 CMD ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
