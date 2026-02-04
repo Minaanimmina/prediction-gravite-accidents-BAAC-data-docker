@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   api:
-    build:
-      context: .
-      dockerfile: api/Dockerfile
+    image: minaanim/accidents-api:latest
     container_name: accidents-api
     ports:
       - "${API_PORT:-8000}:8000"
@@ -21,9 +19,7 @@ services:
     restart: unless-stopped
 
   app:
-    build:
-      context: .
-      dockerfile: app/Dockerfile
+    image: minaanim/accidents-app:latest
     container_name: accidents-app
     ports:
       - "${STREAMLIT_PORT:-8501}:8501"
