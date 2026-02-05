@@ -20,6 +20,6 @@ class PredictionResponse(BaseModel):
     proba_grav1: float
     proba_grav2: float
     proba_grav3: float
-    
+
     class Config:
         from_attributes = True
