@@ -7,3 +7,9 @@ catboost_info/
 .venv/
 virtual_documents/
 data/raw/
+mvc_refactor.diff
+data/raw/
+data/processed/
+models/
+*.joblib
+*.csv

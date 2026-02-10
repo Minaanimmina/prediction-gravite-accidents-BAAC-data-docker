@@ -2,16 +2,15 @@ version: '3.8'
 
 services:
   api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     image: minaanim/accidents-api:latest
     container_name: accidents-api
     ports:
       - "${API_PORT:-8000}:8000"
     depends_on:
       - postgres
-    volumes:
-      - ./api:/app
-      - ./models:/models
-      - ./data/processed:/data/processed
     env_file:
       - .env
     environment:
@@ -19,12 +18,13 @@ services:
     restart: unless-stopped
 
   app:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     image: minaanim/accidents-app:latest
     container_name: accidents-app
     ports:
       - "${STREAMLIT_PORT:-8501}:8501"
-    volumes:
-      - ./app:/app
     env_file:
       - .env
     environment:
