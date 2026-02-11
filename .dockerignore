@@ -1,36 +1,63 @@
-# Fichiers Python
+# === Python ===
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Virtual Environments
 env/
 venv/
 ENV/
-.venv
+.venv/
+.env
+.env.local
+.env*.local
 
-# Jupyter
-.ipynb_checkpoints
+# === Linting & Testing ===
+.pytest_cache/
+.coverage
+.pytest/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+
+# === Jupyter & Notebooks ===
+.ipynb_checkpoints/
 *.ipynb
+notebooks/
 
-# Données brutes
+# === Data & Models ===
 data/raw/
+data/processed/
+*.joblib
+*.pkl
+*.pickle
 
-# Git
+# === Streamlit ===
+.streamlit/
+
+# === Version Control ===
 .git/
 .gitignore
+.gitf/
+.github/
 
-# Documentation
+# === IDE & Editor ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.editorconfig
+
+# === Documentation ===
 docs/
 README.md
 
-# IDE
-.vscode/
-.idea/
-
-# Notebooks
-notebooks/
-
-# OS
-.DS_Store
-Thumbs.db
+# === Other ===
+*.log
+*.diff

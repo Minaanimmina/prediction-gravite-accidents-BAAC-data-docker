@@ -24,39 +24,30 @@ Le modèle est entraîné sur les données **BAAC de l'ONISR** (2022-2024), puis
 ## Structure du Projet
 
 ```ascii
-accidents-gravite/
-├── api/                           # API FastAPI
-│   ├── main.py                    # Endpoints (predict, health, history)
-│   ├── database.py                # Configuration SQLAlchemy & PostgreSQL
-│   ├── models.py                  # Modèles SQLAlchemy (structure BDD)
-│   ├── schemas.py                 # Schémas Pydantic (validation)
-│   ├── __init__.py
-│   └── Dockerfile                 # Image Docker de l'API
-│
-├── app/                           # Interface Streamlit
-│   ├── streamlit_app.py           # Application web
-│   └── Dockerfile                 # Image Docker de Streamlit
-│
-├── data/
-│   ├── raw/                       # Données brutes (2022-2024)
-│   ├── processed/                 # Données nettoyées et préparées
-│   └── doc/                       # Documentation BAAC
-│
-├── models/
-│   ├── best_model_multiclass.joblib    # Modèle entraîné (CatBoost)
-│   └── model_features.csv              # Liste des features utilisées
-│
-├── notebooks/                     # Notebooks Jupyter d'exploration
-│   ├── 01_Data_discovery.ipynb
-│   ├── 02_Data_cleaning.ipynb
-│   ├── 03_EDA_Feature_Engineering.ipynb
-│   └── 04_Modeling.ipynb
-│
+prediction-gravite-accidents-BAAC-data-docker/
 ├── docker-compose.yml             # Orchestration des conteneurs
-├── .env                           # Variables d'environnement (à créer)
-├── .gitignore
 ├── pyproject.toml                 # Dépendances Python
-└── README.md                      # README du projet
+├── README.md                      # Documentation du projet
+├── .gitignore                     # Fichiers ignorés par Git
+├── .dockerignore                  # Fichiers ignorés par Docker
+│
+├── backend/                       # API FastAPI
+│   ├── Dockerfile                 # Image Docker de l'API
+│   ├── app/
+│   │   ├── __init__.py
+│   │   └── main.py                # Endpoints FastAPI (predict, health, history)
+│   ├── controllers/
+│   │   ├── __init__.py
+│   │   └── prediction_controller.py  # Logique de prédiction
+│   └── utils/
+│       ├── __init__.py
+│       ├── config.py               # Configuration de l'application
+│       ├── database.py             # Configuration PostgreSQL & SQLAlchemy
+│       └── schemas.py              # Schémas Pydantic (validation)
+│
+└── frontend/                      # Interface Streamlit
+    ├── Dockerfile                 # Image Docker de Streamlit
+    └── streamlit_app.py           # Application web
 ```
 
 ## Prérequis

@@ -3,10 +3,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Importe les contrôleurs (routes)
-from controllers.prediction_controller import router as prediction_router
+from ..controllers.prediction_controller import router as prediction_router
 
 # Importe la fonction d'initialisation de la BD
-from utils.database import init_db
+from ..utils.database import init_db
 import logging
 
 # Configure les logs
