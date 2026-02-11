@@ -1,14 +1,13 @@
 # Contrôleur pour gérer les prédictions
 from fastapi import APIRouter
-from pydantic import BaseModel
 import pandas as pd
 import joblib
 import logging
 
-from utils.database import SessionLocal
-from models.prediction import Prediction
-from utils.schemas import PredictionCreate, PredictionResponse
-from utils.config import MODEL_PATH, MODEL_FEATURES
+from ..utils.database import SessionLocal
+from ..models.prediction import Prediction
+from ..utils.schemas import PredictionInput, PredictionCreate, PredictionResponse
+from ..utils.config import MODEL_PATH, MODEL_FEATURES
 
 # Crée un routeur pour les endpoints de prédiction
 router = APIRouter(prefix="/api/predictions", tags=["predictions"])
@@ -20,17 +19,9 @@ model = joblib.load(MODEL_PATH)
 model_features = MODEL_FEATURES
 
 
-# Classe qui définit la structure des données attendues lors d'une
-# requête de prédiction
-class PredictRequest(BaseModel):
-    # La requête doit contenir un dictionnaire appelé "features"
-    # Exemple : {"vitesse_max_auto_clean": 50, "acc_est_en_agglo": 1, ...}
-    features: dict
-
-
 # Endpoint pour faire une prédiction
 @router.post("/predict")
-def predict(req: PredictRequest):
+def predict(req: PredictionInput):
     # Crée un tableau pandas contenant les features envoyées par l'utilisateur
     X = pd.DataFrame([req.features])
 
@@ -66,32 +57,35 @@ def predict(req: PredictRequest):
 
     # Enregistrer en BD (optionnel - ne bloque pas si BD indisponible)
     # Étape A : Crée une session BD
-    try:
-        db = SessionLocal()
-
+    if SessionLocal is not None:
         try:
-            # Étape B : Crée une instance Prediction pour enregistrer
-            db_prediction = Prediction(
-                features_json=req.features,
-                prediction=pred_grav,
-                proba_grav1=proba["grav_1"] if proba else 0,
-                proba_grav2=proba["grav_2"] if proba else 0,
-                proba_grav3=proba["grav_3"] if proba else 0
-            )
+            db = SessionLocal()
 
-            # Étape C : Ajoute à la BD
-            db.add(db_prediction)
+            try:
+                # Étape B : Crée une instance Prediction pour enregistrer
+                db_prediction = Prediction(
+                    features_json=req.features,
+                    prediction=pred_grav,
+                    proba_grav1=proba["grav_1"] if proba else 0,
+                    proba_grav2=proba["grav_2"] if proba else 0,
+                    proba_grav3=proba["grav_3"] if proba else 0
+                )
 
-            # Étape D : Valide
-            db.commit()
+                # Étape C : Ajoute à la BD
+                db.add(db_prediction)
 
-        finally:
-            # Étape E : Ferme la session
-            db.close()
-    except Exception as e:
-        # Si la BD n'est pas accessible, on continue quand même
-        # (utile en dev local ou si la BD est down)
-        logging.warning(f"Impossible de sauvegarder en BD: {e}")
+                # Étape D : Valide
+                db.commit()
+
+            finally:
+                # Étape E : Ferme la session
+                db.close()
+        except Exception as e:
+            # Si la BD n'est pas accessible, on continue quand même
+            # (utile en dev local ou si la BD est down)
+            logging.warning(f"Impossible de sauvegarder en BD: {e}")
+    else:
+        logging.info("Base de données non disponible - prédiction non sauvegardée")
 
     # Retourne la prédiction et les probabilités au client
     return {"prediction": pred_grav, "proba": proba}
@@ -100,6 +94,11 @@ def predict(req: PredictRequest):
 # Endpoint pour récupérer l'historique de toutes les prédictions
 @router.get("/history")
 def get_history() -> list[PredictionResponse]:
+    # Vérifie si la base de données est disponible
+    if SessionLocal is None:
+        logging.warning("Base de données non disponible - retour d'un historique vide")
+        return []
+    
     # Crée une session BD
     db = SessionLocal()
 
