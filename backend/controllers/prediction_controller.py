@@ -8,7 +8,6 @@ from ..utils.database import SessionLocal
 from ..models.prediction import Prediction
 from ..utils.schemas import (
     PredictionInput,
-    PredictionCreate,
     PredictionResponse
 )
 from ..utils.config import MODEL_PATH, MODEL_FEATURES

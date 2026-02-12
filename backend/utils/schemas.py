@@ -9,15 +9,6 @@ class PredictionInput(BaseModel):
     features: dict
 
 
-class PredictionCreate(BaseModel):
-    """Schéma pour créer une prédiction en BD (après prédiction)"""
-    features_json: dict
-    prediction: int
-    proba_grav1: float
-    proba_grav2: float
-    proba_grav3: float
-
-
 class PredictionResponse(BaseModel):
     # Ce qu'on retourne au client quand on lit une prédiction
     id: int
