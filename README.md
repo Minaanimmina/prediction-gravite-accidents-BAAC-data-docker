@@ -33,12 +33,19 @@ prediction-gravite-accidents-BAAC-data-docker/
 │
 ├── backend/                       # API FastAPI
 │   ├── Dockerfile                 # Image Docker de l'API
+│   ├── __init__.py
 │   ├── app/
 │   │   ├── __init__.py
 │   │   └── main.py                # Endpoints FastAPI (predict, health, history)
 │   ├── controllers/
 │   │   ├── __init__.py
 │   │   └── prediction_controller.py  # Logique de prédiction
+│   ├── data/
+│   │   └── models/
+│   │       └── best_model_multiclass.joblib  # Modele ML entraine
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── prediction.py           # Modele SQLAlchemy des predictions
 │   └── utils/
 │       ├── __init__.py
 │       ├── config.py               # Configuration de l'application
