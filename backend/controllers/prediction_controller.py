@@ -1,4 +1,4 @@
-# Contrôleur pour gérer les prédictions
+"""Controleur pour gerer les predictions."""
 from fastapi import APIRouter
 import pandas as pd
 import joblib
@@ -6,7 +6,11 @@ import logging
 
 from ..utils.database import SessionLocal
 from ..models.prediction import Prediction
-from ..utils.schemas import PredictionInput, PredictionCreate, PredictionResponse
+from ..utils.schemas import (
+    PredictionInput,
+    PredictionCreate,
+    PredictionResponse
+)
 from ..utils.config import MODEL_PATH, MODEL_FEATURES
 
 # Crée un routeur pour les endpoints de prédiction
@@ -85,7 +89,10 @@ def predict(req: PredictionInput):
             # (utile en dev local ou si la BD est down)
             logging.warning(f"Impossible de sauvegarder en BD: {e}")
     else:
-        logging.info("Base de données non disponible - prédiction non sauvegardée")
+        logging.info(
+            "Base de données non disponible - "
+            "prédiction non sauvegardée"
+        )
 
     # Retourne la prédiction et les probabilités au client
     return {"prediction": pred_grav, "proba": proba}
@@ -96,9 +103,12 @@ def predict(req: PredictionInput):
 def get_history() -> list[PredictionResponse]:
     # Vérifie si la base de données est disponible
     if SessionLocal is None:
-        logging.warning("Base de données non disponible - retour d'un historique vide")
+        logging.warning(
+            "Base de données non disponible - "
+            "retour d'un historique vide"
+        )
         return []
-    
+
     # Crée une session BD
     db = SessionLocal()
 

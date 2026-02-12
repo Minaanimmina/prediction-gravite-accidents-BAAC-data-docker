@@ -1,3 +1,5 @@
+"""Application Streamlit pour la prediction de gravite."""
+
 import streamlit as st
 import requests
 import os

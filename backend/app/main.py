@@ -1,4 +1,5 @@
-# Point d'entrée de l'application API
+"""Point d'entree de l'application API."""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -23,7 +24,7 @@ app = FastAPI(
 # Configure CORS pour permettre les requêtes du frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8501", "http://127.0.0.1:8501"],  # URLs Streamlit
+    allow_origins=["http://localhost:8501", "http://127.0.0.1:8501"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -33,7 +34,7 @@ app.add_middleware(
 # Cela crée la table "predictions" si elle n'existe pas
 try:
     init_db()
-    logger.info("Base de donnees initialisee avec succes")
+    logger.info("Base de donnees initialisée avec succes")
 except Exception as e:
     logger.warning(f"Impossible d'initialiser la BD: {e}")
     logger.info("L'API fonctionnera sans BD en dev local")

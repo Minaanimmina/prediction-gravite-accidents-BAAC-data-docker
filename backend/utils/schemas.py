@@ -1,9 +1,16 @@
+"""Schemas Pydantic pour les entrees/sorties de l'API."""
+
 from pydantic import BaseModel
 from datetime import datetime
 
 
+class PredictionInput(BaseModel):
+    """Schéma pour l'input : les features à prédire"""
+    features: dict
+
+
 class PredictionCreate(BaseModel):
-    # Ce qu'on reçoit pour créer une prédiction en BD
+    """Schéma pour créer une prédiction en BD (après prédiction)"""
     features_json: dict
     prediction: int
     proba_grav1: float
