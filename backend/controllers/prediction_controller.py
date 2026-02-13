@@ -64,9 +64,9 @@ def predict(req: PredictionInput) -> dict[str, object]:
                 db_prediction = Prediction(
                     features_json=req.features,
                     prediction=pred_grav,
-                    proba_grav1=proba["grav_1"] if proba else 0.0, # type: ignore[arg-type]
-                    proba_grav2=proba["grav_2"] if proba else 0.0, # type: ignore[arg-type]
-                    proba_grav3=proba["grav_3"] if proba else 0.0, # type: ignore[arg-type]
+                    proba_grav1=proba["grav_1"] if proba else 0.0,  # type: ignore[arg-type]
+                    proba_grav2=proba["grav_2"] if proba else 0.0,  # type: ignore[arg-type]
+                    proba_grav3=proba["grav_3"] if proba else 0.0,  # type: ignore[arg-type]
                 )
 
                 # Étape C : Ajoute à la BD
