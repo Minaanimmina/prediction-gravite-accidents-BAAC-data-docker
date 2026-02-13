@@ -73,10 +73,3 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 python_functions = "test_*"
 addopts = "--strict-markers --cov=backend --cov-report=term-missing"
-
-[tool.setuptools.packages.find]
-include = ["backend*"]
-
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
