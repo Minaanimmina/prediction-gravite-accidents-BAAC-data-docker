@@ -74,6 +74,11 @@ jobs:
         run: |
           uv sync
           uv pip install -e .
+      - name: Debug imports
+        run: |
+          .venv/bin/python -c "import backend; print(backend.__file__)"
+          .venv/bin/python -c "import backend.models; print(backend.models.__file__)"
+          .venv/bin/python -c "import backend.models.prediction; print('OK')"
       - name: Execute tests
         run: .venv/bin/pytest tests/
 
