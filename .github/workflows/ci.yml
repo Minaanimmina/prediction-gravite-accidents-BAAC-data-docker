@@ -73,7 +73,5 @@ jobs:
       - name: Install dependencies
         run: uv sync
       - name: Execute tests
-        env:
-          PYTHONPATH: .
-        run: uv run pytest tests/
+        run: PYTHONPATH=. uv run pytest tests/
 
