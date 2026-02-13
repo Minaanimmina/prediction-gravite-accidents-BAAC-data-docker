@@ -46,7 +46,7 @@ app.include_router(prediction_router)
 
 # Endpoint de santé pour vérifier que l'API fonctionne
 @app.get("/health")
-def health():
+def health() -> dict[str, str]:
     """Endpoint de santé pour vérifier que l'API est en ligne"""
     return {"status": "ok"}
 

@@ -58,6 +58,10 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 plugins = ["sqlalchemy.ext.mypy.plugin"]
 
+[[tool.mypy.overrides]]
+module = ["joblib", "pandas", "lightgbm", "sklearn.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"

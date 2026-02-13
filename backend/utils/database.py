@@ -46,7 +46,7 @@ else:
 
 
 # Fonction pour créer toutes les tables automatiquement
-def init_db():
+def init_db() -> None:
     if engine is not None:
         try:
             Base.metadata.create_all(bind=engine)

@@ -23,7 +23,7 @@ model_features = MODEL_FEATURES
 
 # Endpoint pour faire une prédiction
 @router.post("/predict")
-def predict(req: PredictionInput):
+def predict(req: PredictionInput) -> dict[str, object]:
     # Crée un tableau pandas contenant les features envoyées par l'utilisateur
     X = pd.DataFrame([req.features])
 
@@ -64,9 +64,9 @@ def predict(req: PredictionInput):
                 db_prediction = Prediction(
                     features_json=req.features,
                     prediction=pred_grav,
-                    proba_grav1=proba["grav_1"] if proba else 0,
-                    proba_grav2=proba["grav_2"] if proba else 0,
-                    proba_grav3=proba["grav_3"] if proba else 0,
+                    proba_grav1=proba["grav_1"] if proba else 0.0, # type: ignore[arg-type]
+                    proba_grav2=proba["grav_2"] if proba else 0.0, # type: ignore[arg-type]
+                    proba_grav3=proba["grav_3"] if proba else 0.0, # type: ignore[arg-type]
                 )
 
                 # Étape C : Ajoute à la BD
