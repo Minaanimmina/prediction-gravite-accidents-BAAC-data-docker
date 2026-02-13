@@ -52,12 +52,6 @@ COVERAGE.xml
 # === Streamlit ===
 .streamlit/
 
-# === Model ML ===
-*.joblib
-*.pkl
-*.pickle
-*.csv
-
 # === Build & Package Tools ===
 catboost_info/
 **/catboost_info/
