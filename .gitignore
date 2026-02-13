@@ -52,10 +52,7 @@ COVERAGE.xml
 # === Streamlit ===
 .streamlit/
 
-# === Data & Models ===
-data/raw/
-data/processed/
-models/
+# === Model ML ===
 *.joblib
 *.pkl
 *.pickle
