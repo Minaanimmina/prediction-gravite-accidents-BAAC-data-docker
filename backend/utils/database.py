@@ -1,11 +1,12 @@
 """Initialisation SQLAlchemy et gestion des sessions."""
 
 # Importe les outils SQLAlchemy
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-import os
-from dotenv import load_dotenv
 import logging
+import os
+
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,9 @@ if DATABASE_URL:
         engine = None
         SessionLocal = None
 else:
-    logger.warning("DATABASE_URL n'est pas définie - l'API fonctionnera sans base de données")
+    logger.warning(
+        "DATABASE_URL n'est pas définie - l'API fonctionnera sans base de données"
+    )
 
 
 # Fonction pour créer toutes les tables automatiquement

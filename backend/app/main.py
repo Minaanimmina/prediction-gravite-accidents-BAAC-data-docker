@@ -1,5 +1,7 @@
 """Point d'entree de l'application API."""
 
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -8,7 +10,6 @@ from ..controllers.prediction_controller import router as prediction_router
 
 # Importe la fonction d'initialisation de la BD
 from ..utils.database import init_db
-import logging
 
 # Configure les logs
 logging.basicConfig(level=logging.INFO)
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Accidents Gravité API",
     description="API pour prédire la gravité des accidents de la route",
-    version="0.1.0"
+    version="0.1.0",
 )
 
 # Configure CORS pour permettre les requêtes du frontend
@@ -52,4 +53,5 @@ def health():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

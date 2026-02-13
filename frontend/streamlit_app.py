@@ -1,8 +1,9 @@
 """Application Streamlit pour la prediction de gravite."""
 
-import streamlit as st
-import requests
 import os
+
+import requests
+import streamlit as st
 
 API_URL = os.getenv("API_URL", "http://127.0.0.1:8000") + "/api/predictions/predict"
 
@@ -473,7 +474,6 @@ def yes_no_to_int(choice: str) -> int:
 left_col, right_col = st.columns([2.1, 1], gap="large")
 
 with left_col:
-
     col_a, col_b = st.columns(2)
 
     with col_a:
@@ -551,9 +551,9 @@ with left_col:
 
     st.markdown(
         '<div class="compact-field">'
-        '<p><b>Route rapide</b> '
+        "<p><b>Route rapide</b> "
         '<span class="card-muted">(vitesse maximale > 90 km/h)</span>'
-        '</p>',
+        "</p>",
         unsafe_allow_html=True,
     )
     route_rapide_label = st.selectbox(
@@ -567,10 +567,10 @@ with left_col:
 
     st.markdown(
         '<div class="compact-field">'
-        '<p><b>Infrastructure complexe</b> '
+        "<p><b>Infrastructure complexe</b> "
         '<span class="card-muted">'
-        '(intersection, échangeur, plusieurs voies)'
-        '</span></p>',
+        "(intersection, échangeur, plusieurs voies)"
+        "</span></p>",
         unsafe_allow_html=True,
     )
     infra_complexe_label = st.selectbox(
@@ -636,15 +636,13 @@ with right_col:
         unsafe_allow_html=True,
     )
 
-    st.markdown(
-        '<div class="predict-btn-wrap">', unsafe_allow_html=True
-    )
+    st.markdown('<div class="predict-btn-wrap">', unsafe_allow_html=True)
     submitted = st.button(
         "Lancer la prédiction",
         key="predict_button",
         use_container_width=True,
     )
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
     if "last_prediction" not in st.session_state:
         st.session_state.last_prediction = None
@@ -660,14 +658,10 @@ with right_col:
     if submitted:
         payload = {"features": features}
         try:
-            r = requests.post(
-                API_URL, json=payload, timeout=10
-            )
+            r = requests.post(API_URL, json=payload, timeout=10)
             r.raise_for_status()
             data = r.json()
-            st.session_state.last_prediction = data.get(
-                "prediction"
-            )
+            st.session_state.last_prediction = data.get("prediction")
             st.session_state.last_proba = data.get("proba")
             st.session_state.last_error = None
         except Exception as exc:
@@ -675,21 +669,13 @@ with right_col:
 
     if st.session_state.last_error:
         st.error("L'API ne répond pas correctement.")
-        st.caption(
-            f"Détail technique : {st.session_state.last_error}"
-        )
-        st.info(
-            "Vérifie que FastAPI est bien lancé sur le port 8000."
-        )
+        st.caption(f"Détail technique : {st.session_state.last_error}")
+        st.info("Vérifie que FastAPI est bien lancé sur le port 8000.")
     elif st.session_state.last_prediction is None:
-        st.info(
-            "Lance une prédiction pour afficher le résultat ici."
-        )
+        st.info("Lance une prédiction pour afficher le résultat ici.")
     else:
         prediction_value = st.session_state.last_prediction
-        prediction_label = severity_labels.get(
-            prediction_value, str(prediction_value)
-        )
+        prediction_label = severity_labels.get(prediction_value, str(prediction_value))
 
         st.markdown(
             f"""

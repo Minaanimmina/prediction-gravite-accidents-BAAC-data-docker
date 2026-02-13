@@ -1,11 +1,13 @@
 """Schemas Pydantic pour les entrees/sorties de l'API."""
 
-from pydantic import BaseModel
 from datetime import datetime
+
+from pydantic import BaseModel
 
 
 class PredictionInput(BaseModel):
     """Schéma pour l'input : les features à prédire"""
+
     features: dict
 
 
