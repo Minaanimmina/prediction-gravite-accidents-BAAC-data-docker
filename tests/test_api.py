@@ -73,8 +73,7 @@ def test_predict_with_default_streamlit_values():
 def test_predict_with_partial_features():
     """Teste que l'API gère les features manquantes."""
     response = client.post(
-        "/api/predictions/predict",
-        json={"features": {"luminosite": 1, "cond_atmo": 2}}
+        "/api/predictions/predict", json={"features": {"luminosite": 1, "cond_atmo": 2}}
     )
     assert response.status_code == 200
     data = response.json()
