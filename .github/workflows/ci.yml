@@ -5,6 +5,12 @@ on:
   pull_request:
     branches: [main, develop]
 jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - uses: pre-commit/action@v3.0.0
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -74,10 +80,5 @@ jobs:
         run: |
           uv sync
           uv pip install -e .
-      - name: Debug imports
-        run: |
-          .venv/bin/python -c "import backend; print(backend.__file__)"
-          .venv/bin/python -c "import backend.models; print(backend.models.__file__)"
-          .venv/bin/python -c "import backend.models.prediction; print('OK')"
       - name: Execute tests
         run: .venv/bin/pytest tests/
