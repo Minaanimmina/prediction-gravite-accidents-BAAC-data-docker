@@ -1,24 +1,32 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 
+# Dossier de travail dans le conteneur
 WORKDIR /app
 
-# Installe les packages Python
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir \
-    streamlit>=1.30 \
-    requests>=2.31 \
-    pandas>=2.0
+# Copie uv depuis son image officielle
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Dit à uv d'utiliser le Python du système
+ENV UV_SYSTEM_PYTHON=1
+
+# Copie les fichiers de dépendances
+COPY pyproject.toml uv.lock ./
+
+# Installe les dépendances Python
+RUN uv pip install .
 
 # Copie le code du frontend
-COPY frontend/streamlit_app.py .
+COPY frontend/ ./frontend/
 
-# Crée un utilisateur non-root pour la sécurité
+# Crée un utilisateur non-root
 RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
 
 # Change vers l'utilisateur non-root
 USER appuser
 
+# Documente le port exposé
 EXPOSE 8501
 
-CMD ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Lance l'application Streamlit
+CMD ["streamlit", "run", "frontend/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
