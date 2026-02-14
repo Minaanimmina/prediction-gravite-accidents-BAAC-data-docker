@@ -386,10 +386,10 @@ app:
 
 ### Bonnes pratiques
 
-- Utilise des **tags explicites** (pas seulement `latest`)  
-- Documente tes images sur DockerHub (description, README)  
-- Ajoute une **version** : `TON_USERNAME/accidents-api:v1.0.0`  
-- Utilise `latest` pour la version stable  
+- Utilise des **tags explicites** (pas seulement `latest`)
+- Documente tes images sur DockerHub (description, README)
+- Ajoute une **version** : `TON_USERNAME/accidents-api:v1.0.0`
+- Utilise `latest` pour la version stable
 - Crée une **section "Releases"** sur ton repo GitHub
 
 ### Exemple avec versions
@@ -538,10 +538,10 @@ Accès : **[http://127.0.0.1:8501](http://127.0.0.1:8501)**
 
 ### Bonnes pratiques utilisées
 
-- Variables d'environnement pour les credentials (`.env`)  
-- `.env` dans `.gitignore` (pas committé)  
-- Validation des données avec Pydantic  
-- Gestion propre des sessions bases de données (try/finally)  
+- Variables d'environnement pour les credentials (`.env`)
+- `.env` dans `.gitignore` (pas committé)
+- Validation des données avec Pydantic
+- Gestion propre des sessions bases de données (try/finally)
 - Séparation des préoccupations (database, models, schemas, main)
 
 ## Technologies Utilisées

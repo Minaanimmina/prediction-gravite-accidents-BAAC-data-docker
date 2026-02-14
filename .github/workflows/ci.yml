@@ -81,4 +81,3 @@ jobs:
           .venv/bin/python -c "import backend.models.prediction; print('OK')"
       - name: Execute tests
         run: .venv/bin/pytest tests/
-

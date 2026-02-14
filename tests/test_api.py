@@ -8,7 +8,7 @@ client = TestClient(app)
 
 
 # @router.post("/predict")
-def test_predict_endpoint_success():
+def test_predict_endpoint_success() -> None:
     # Exemple de features pour faire une prédiction
     input_data = {
         "features": {
@@ -37,14 +37,14 @@ def test_predict_endpoint_success():
 
 
 # @app.get("/health")
-def test_health():
+def test_health() -> None:
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
 
 # test valeurs par défaut du formulaire Streamlit
-def test_predict_with_default_streamlit_values():
+def test_predict_with_default_streamlit_values() -> None:
     """Teste avec les valeurs par défaut du formulaire Streamlit."""
     features = {
         "vitesse_max_auto_clean": 50,
@@ -62,7 +62,8 @@ def test_predict_with_default_streamlit_values():
         "saison_Ete": 0,
         "saison_Automne": 0,
     }
-    response = client.post("/api/predictions/predict", json={"features": features})
+    payload = {"features": features}
+    response = client.post("/api/predictions/predict", json=payload)
     assert response.status_code == 200
     data = response.json()
     assert data["prediction"] in [1, 2, 3]
@@ -70,25 +71,24 @@ def test_predict_with_default_streamlit_values():
 
 
 # Test avec features partielles
-def test_predict_with_partial_features():
+def test_predict_with_partial_features() -> None:
     """Teste que l'API gère les features manquantes."""
-    response = client.post(
-        "/api/predictions/predict", json={"features": {"luminosite": 1, "cond_atmo": 2}}
-    )
+    payload = {"features": {"luminosite": 1, "cond_atmo": 2}}
+    response = client.post("/api/predictions/predict", json=payload)
     assert response.status_code == 200
     data = response.json()
     assert data["prediction"] in [1, 2, 3]
 
 
 # Test avec features invalides
-def test_predict_invalid_input():
+def test_predict_invalid_input() -> None:
     """Teste qu'une requête sans 'features' retourne une erreur 422."""
     response = client.post("/api/predictions/predict", json={"mauvaise_cle": 123})
     assert response.status_code == 422
 
 
 # Test historique sans base
-def test_history_without_db():
+def test_history_without_db() -> None:
     """Teste que l'historique retourne une liste vide sans base de données."""
     response = client.get("/api/predictions/history")
     assert response.status_code == 200

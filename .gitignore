@@ -37,7 +37,7 @@ ehthumbs.db
 .ipynb_checkpoints/
 *.ipynb
 notebooks/
-virtual_documents/
+.virtual_documents/
 
 # === Testing & Linting ===
 .pytest_cache/
