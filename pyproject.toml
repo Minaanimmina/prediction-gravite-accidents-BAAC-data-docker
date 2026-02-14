@@ -33,6 +33,7 @@ dev = [
     "bandit",
     "safety",
     "httpx",
+    "pre-commit"
 ]
 
 [tool.ruff]
