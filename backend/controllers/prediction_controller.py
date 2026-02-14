@@ -51,7 +51,11 @@ def predict(req: PredictionInput) -> dict[str, object]:
         # Récupère les probabilités pour chaque classe
         p = model.predict_proba(X)[0]  # ex: [p0, p1, p2]
         # Les convertit en dictionnaire plus lisible
-        proba = {"grav_1": float(p[0]), "grav_2": float(p[1]), "grav_3": float(p[2])}
+        proba = {
+            "grav_1": float(p[0]),
+            "grav_2": float(p[1]),
+            "grav_3": float(p[2]),
+        }
 
     # Enregistrer en BD (optionnel - ne bloque pas si BD indisponible)
     # Étape A : Crée une session BD
@@ -64,9 +68,9 @@ def predict(req: PredictionInput) -> dict[str, object]:
                 db_prediction = Prediction(
                     features_json=req.features,
                     prediction=pred_grav,
-                    proba_grav1=proba["grav_1"] if proba else 0.0,  # type: ignore[arg-type]
-                    proba_grav2=proba["grav_2"] if proba else 0.0,  # type: ignore[arg-type]
-                    proba_grav3=proba["grav_3"] if proba else 0.0,  # type: ignore[arg-type]
+                    proba_grav1=(proba["grav_1"] if proba else 0.0),  # type: ignore[arg-type]
+                    proba_grav2=(proba["grav_2"] if proba else 0.0),  # type: ignore[arg-type]
+                    proba_grav3=(proba["grav_3"] if proba else 0.0),  # type: ignore[arg-type]
                 )
 
                 # Étape C : Ajoute à la BD

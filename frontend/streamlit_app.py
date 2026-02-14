@@ -5,7 +5,8 @@ import os
 import requests
 import streamlit as st
 
-API_URL = os.getenv("API_URL", "http://127.0.0.1:8000") + "/api/predictions/predict"
+BASE_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
+API_URL = BASE_URL + "/api/predictions/predict"
 
 st.set_page_config(
     page_title="Gravité des accidents • Prédiction",

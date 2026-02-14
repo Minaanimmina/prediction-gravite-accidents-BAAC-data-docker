@@ -1,6 +1,7 @@
 """
 Modèle SQLAlchemy pour stocker les prédictions en base de données.
 """
+
 from datetime import datetime
 
 from sqlalchemy import JSON, Column, DateTime, Float, Integer
@@ -12,6 +13,7 @@ class Prediction(Base):
     """
     Table pour stocker l'historique des prédictions.
     """
+
     __tablename__ = "predictions"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
