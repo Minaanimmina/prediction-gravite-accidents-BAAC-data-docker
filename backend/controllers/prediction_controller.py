@@ -1,16 +1,15 @@
 """Controleur pour gerer les predictions."""
-from fastapi import APIRouter
-import pandas as pd
-import joblib
+
 import logging
 
-from ..utils.database import SessionLocal
+import joblib
+import pandas as pd
+from fastapi import APIRouter
+
 from ..models.prediction import Prediction
-from ..utils.schemas import (
-    PredictionInput,
-    PredictionResponse
-)
-from ..utils.config import MODEL_PATH, MODEL_FEATURES
+from ..utils.config import MODEL_FEATURES, MODEL_PATH
+from ..utils.database import SessionLocal
+from ..utils.schemas import PredictionInput, PredictionResponse
 
 # Crée un routeur pour les endpoints de prédiction
 router = APIRouter(prefix="/api/predictions", tags=["predictions"])
@@ -24,7 +23,7 @@ model_features = MODEL_FEATURES
 
 # Endpoint pour faire une prédiction
 @router.post("/predict")
-def predict(req: PredictionInput):
+def predict(req: PredictionInput) -> dict[str, object]:
     # Crée un tableau pandas contenant les features envoyées par l'utilisateur
     X = pd.DataFrame([req.features])
 
@@ -55,7 +54,7 @@ def predict(req: PredictionInput):
         proba = {
             "grav_1": float(p[0]),
             "grav_2": float(p[1]),
-            "grav_3": float(p[2])
+            "grav_3": float(p[2]),
         }
 
     # Enregistrer en BD (optionnel - ne bloque pas si BD indisponible)
@@ -69,9 +68,9 @@ def predict(req: PredictionInput):
                 db_prediction = Prediction(
                     features_json=req.features,
                     prediction=pred_grav,
-                    proba_grav1=proba["grav_1"] if proba else 0,
-                    proba_grav2=proba["grav_2"] if proba else 0,
-                    proba_grav3=proba["grav_3"] if proba else 0
+                    proba_grav1=(proba["grav_1"] if proba else 0.0),  # type: ignore[arg-type]
+                    proba_grav2=(proba["grav_2"] if proba else 0.0),  # type: ignore[arg-type]
+                    proba_grav3=(proba["grav_3"] if proba else 0.0),  # type: ignore[arg-type]
                 )
 
                 # Étape C : Ajoute à la BD
@@ -88,10 +87,7 @@ def predict(req: PredictionInput):
             # (utile en dev local ou si la BD est down)
             logging.warning(f"Impossible de sauvegarder en BD: {e}")
     else:
-        logging.info(
-            "Base de données non disponible - "
-            "prédiction non sauvegardée"
-        )
+        logging.info("Base de données non disponible - prédiction non sauvegardée")
 
     # Retourne la prédiction et les probabilités au client
     return {"prediction": pred_grav, "proba": proba}
@@ -102,10 +98,7 @@ def predict(req: PredictionInput):
 def get_history() -> list[PredictionResponse]:
     # Vérifie si la base de données est disponible
     if SessionLocal is None:
-        logging.warning(
-            "Base de données non disponible - "
-            "retour d'un historique vide"
-        )
+        logging.warning("Base de données non disponible - retour d'un historique vide")
         return []
 
     # Crée une session BD
