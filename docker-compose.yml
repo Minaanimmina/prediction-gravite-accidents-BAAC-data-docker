@@ -15,6 +15,7 @@ services:
       - .env
     environment:
       - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql://postgres:mina@postgres:5432/accidents_predictions
     restart: unless-stopped
 
   app:

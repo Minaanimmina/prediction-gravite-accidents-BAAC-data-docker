@@ -26,18 +26,6 @@ ENV/
 .ruff_cache/
 htmlcov/
 
-# === Jupyter & Notebooks ===
-.ipynb_checkpoints/
-*.ipynb
-notebooks/
-
-# === Data & Models ===
-data/raw/
-data/processed/
-*.joblib
-*.pkl
-*.pickle
-
 # === Streamlit ===
 .streamlit/
 
