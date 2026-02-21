@@ -22,6 +22,11 @@ st.markdown(
                '=swap');
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:'
                'wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:'
+               'wght@500;600;700&family=Space+Mono:wght@400;700&display'
+               '=swap');
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:'
+               'wght@400;500;600;700&display=swap');
 
     :root {
         --bg: #fdfdf8;
@@ -50,6 +55,8 @@ st.markdown(
 
     /* Polices + couleur par défaut */
     html, body, .stApp {
+        font-family: 'DM Sans', system-ui, -apple-system,
+                     BlinkMacSystemFont, sans-serif;
         font-family: 'DM Sans', system-ui, -apple-system,
                      BlinkMacSystemFont, sans-serif;
         color: var(--text);
@@ -83,6 +90,9 @@ st.markdown(
         max-width: 1480px;
     }
 
+    [data-testid="stSidebar"],
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"] {
     [data-testid="stSidebar"],
     [data-testid="stHeader"],
     [data-testid="stToolbar"] {
@@ -200,6 +210,8 @@ st.markdown(
     [data-testid="stWidgetLabel"] p {
     font-size: 1.02rem !important;
     font-weight: 700 !important;
+    font-size: 1.02rem !important;
+    font-weight: 700 !important;
     color: var(--text) !important;
     line-height: 1.15 !important;
     margin-bottom: 0.25rem !important;
@@ -309,6 +321,8 @@ st.markdown(
 
     ul[data-testid="stSelectboxVirtualDropdown"] \
     li[role="option"][aria-selected="true"] {
+    ul[data-testid="stSelectboxVirtualDropdown"] \
+    li[role="option"][aria-selected="true"] {
         background: var(--dropdown-selected) !important;
     }
 
@@ -370,7 +384,10 @@ st.markdown(
 
     /* ==========================================================
        Aligner le début de la colonne gauche avec la carte
+       Aligner le début de la colonne gauche avec la carte
        ========================================================== */
+    [data-testid="stHorizontalBlock"] > div:first-child
+    [data-testid="stVerticalBlock"] > div:first-child {
     [data-testid="stHorizontalBlock"] > div:first-child
     [data-testid="stVerticalBlock"] > div:first-child {
         margin-top: 1.2rem !important;
@@ -392,6 +409,7 @@ st.markdown(
         font-size: 1.02rem !important;
         line-height: 1.1 !important;
     }
+
 
     /* ==========================================================
     FIX: halo/boîte sombre autour du dropdown (coins extérieurs)
@@ -462,6 +480,10 @@ st.markdown(
         <p class="card-muted">Aidez les décideurs à anticiper les zones
         et contextes à risque en estimant la gravité probable d'un
         accident à partir de ses conditions.</p>
+        <h1>Prévoir la gravité d'un accident</h1>
+        <p class="card-muted">Aidez les décideurs à anticiper les zones
+        et contextes à risque en estimant la gravité probable d'un
+        accident à partir de ses conditions.</p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -495,8 +517,24 @@ with left_col:
             ["Non", "Oui"],
             index=1,
         )
+        agglo_label = st.selectbox(
+            "L'accident a eu lieu en agglomération",
+            ["Non", "Oui"],
+            index=1,
+        )
+        intersection_label = st.selectbox(
+            "Dans une intersection",
+            ["Non", "Oui"],
+            index=1,
+        )
 
     with col_b:
+        nb_voies = st.number_input(
+            "Nombre de voies",
+            min_value=0,
+            max_value=10,
+            value=2,
+        )
         nb_voies = st.number_input(
             "Nombre de voies",
             min_value=0,
@@ -510,6 +548,11 @@ with left_col:
             "Nuit avec éclairage public non allumé": 4,
             "Nuit avec éclairage public allumé": 5,
         }
+        luminosite_label = st.selectbox(
+            "Luminosité",
+            list(luminosite_map.keys()),
+            index=0,
+        )
         luminosite_label = st.selectbox(
             "Luminosité",
             list(luminosite_map.keys()),
@@ -532,6 +575,11 @@ with left_col:
             list(cond_atmo_map.keys()),
             index=0,
         )
+        cond_atmo_label = st.selectbox(
+            "Conditions atmosphériques",
+            list(cond_atmo_map.keys()),
+            index=0,
+        )
 
         etat_surface_map = {
             "Normale": 1,
@@ -544,6 +592,11 @@ with left_col:
             "Corps gras / huile": 8,
             "Autre": 9,
         }
+        etat_surface_label = st.selectbox(
+            "État de la surface",
+            list(etat_surface_map.keys()),
+            index=0,
+        )
         etat_surface_label = st.selectbox(
             "État de la surface",
             list(etat_surface_map.keys()),
@@ -590,7 +643,17 @@ with left_col:
             ["Non", "Oui"],
             index=0,
         )
+        jour_nuit_label = st.selectbox(
+            "L'accident a eu lieu la nuit",
+            ["Non", "Oui"],
+            index=0,
+        )
     with col_d:
+        saison = st.selectbox(
+            "Saison",
+            ["Hiver", "Printemps", "Ete", "Automne"],
+            index=0,
+        )
         saison = st.selectbox(
             "Saison",
             ["Hiver", "Printemps", "Ete", "Automne"],
@@ -628,6 +691,10 @@ with right_col:
     st.markdown(
         """
         <div class="card">
+            <h3>Scénario d'accident</h3>
+            <p class="card-muted">Renseignez les conditions de
+            circulation et l'environnement pour lancer la
+            prédiction.</p>
             <h3>Scénario d'accident</h3>
             <p class="card-muted">Renseignez les conditions de
             circulation et l'environnement pour lancer la
@@ -684,6 +751,8 @@ with right_col:
                 <h2>{prediction_label}</h2>
                 <p class="card-muted">Classe prédite
                 (code : {prediction_value}).</p>
+                <p class="card-muted">Classe prédite
+                (code : {prediction_value}).</p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -697,7 +766,17 @@ with right_col:
         """
         <div class="card">
             <h4>Conseils d'interprétation</h4>
+            <h4>Conseils d'interprétation</h4>
             <ul>
+                <li>Comparez les probabilités : plus elles
+                sont proches, plus la prédiction est
+                incertaine.</li>
+                <li>Utilisez la gravité prédite pour
+                orienter les actions (prévention, contrôle,
+                aménagement).</li>
+                <li>Interprétez toujours avec votre contexte
+                (lieu, heure, météo) et vos analyses de
+                données.</li>
                 <li>Comparez les probabilités : plus elles
                 sont proches, plus la prédiction est
                 incertaine.</li>
