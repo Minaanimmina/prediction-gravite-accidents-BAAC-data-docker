@@ -17,7 +17,7 @@ dependencies = [
   "scikit-learn>=1.3",
   "sqlalchemy>=2.0",
   "psycopg2-binary>=2.9",
-  "python-dotenv",
+  "python-dotenv"
 ]
 
 [build-system]
@@ -33,7 +33,8 @@ dev = [
     "bandit",
     "safety",
     "httpx",
-    "pre-commit"
+    "pre-commit",
+    "python-semantic-release"
 ]
 
 [tool.ruff]
@@ -81,3 +82,36 @@ addopts = "--strict-markers --cov=backend --cov-report=term-missing"
 
 [tool.setuptools.packages.find]
 include = ["backend*"]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+branch = "main"
+commit_message = "chore(release): v{version}"
+build_command = ""
+
+[tool.semantic_release.branches.main]
+match = "main"
+prerelease = false
+
+[tool.semantic_release.branches.develop]
+match = "develop"
+prerelease = true
+prerelease_token = "rc"
+
+[tool.semantic_release.changelog]
+template_dir = "templates"
+
+[tool.semantic_release.changelog.default_templates]
+changelog_file = "CHANGELOG.md"
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "style", "refactor", "test"]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf"]
+
+[tool.semantic_release.remote]
+name = "origin"
+type = "github"
+
+[tool.semantic_release.publish]
+upload_to_vcs_release = true
