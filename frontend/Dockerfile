@@ -1,5 +1,10 @@
 FROM python:3.13-slim
 
+# Metadata pour l'image Docker
+LABEL maintainer="Mina"
+LABEL version="0.1.0"
+LABEL description="Interface de visualisation des prédictions de gravité des accidents"
+
 # Dossier de travail dans le conteneur
 WORKDIR /app
 
