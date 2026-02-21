@@ -1,48 +1,69 @@
-version: '3.8'
-
 services:
   api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     image: minaanim/accidents-api:latest
     container_name: accidents-api
     ports:
       - "${API_PORT:-8000}:8000"
     depends_on:
-      - postgres
-    volumes:
-      - ./api:/app
-      - ./models:/models
-      - ./data/processed:/data/processed
+      postgres:
+        condition: service_healthy
     env_file:
       - .env
     environment:
       - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
 
   app:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     image: minaanim/accidents-app:latest
     container_name: accidents-app
     ports:
       - "${STREAMLIT_PORT:-8501}:8501"
-    volumes:
-      - ./app:/app
     env_file:
       - .env
     environment:
       - API_URL=${API_URL:-http://api:8000}
     restart: unless-stopped
-  
+    networks:
+      - app-network
+
   postgres:
     image: postgres:15-alpine
     container_name: accidents-postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mina
-      POSTGRES_DB: accidents_predictions
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+# Déclaration du réseau pour permettre la communication entre les conteneurs
+networks:
+  app-network:
+    driver: bridge
