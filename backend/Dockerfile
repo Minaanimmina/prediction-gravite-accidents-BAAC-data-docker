@@ -1,9 +1,13 @@
 # Image de base Python 3.13 version légère (sans outils inutiles)
 FROM python:3.13-slim
 
+# Metadata pour l'image Docker
+LABEL maintainer="Mina"
+LABEL version="0.1.0"
+LABEL description="API de prédiction de gravité des accidents"
+
 # Dossier de travail dans le conteneur
 WORKDIR /app
-
 
 # Installe les outils système nécessaires :
 # - gcc : compilateur C (nécessaire pour certains packages Python)
