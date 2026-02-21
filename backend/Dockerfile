@@ -1,53 +1,58 @@
-# Image de base Python 3.13 version légère (sans outils inutiles)
+# ============================================
+# Stage 1 : BUILDER - compile les dépendances
+# ============================================
+FROM python:3.13-slim AS builder
+
+WORKDIR /app
+
+# gcc est nécessaire pour compiler certains packages Python (ex: psycopg2)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Récupère uv depuis son image officielle
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+ENV UV_SYSTEM_PYTHON=1
+
+# Copie les fichiers de dépendances et installe
+# On copie ces fichiers EN PREMIER pour profiter du cache Docker :
+# si le code change mais pas les dépendances, cette étape est skipée
+COPY pyproject.toml uv.lock ./
+RUN uv pip install .
+
+# ============================================
+# Stage 2 : FINAL - image de production
+# ============================================
 FROM python:3.13-slim
 
-# Metadata pour l'image Docker
 LABEL maintainer="Mina"
 LABEL version="0.1.0"
 LABEL description="API de prédiction de gravité des accidents"
 
-# Dossier de travail dans le conteneur
 WORKDIR /app
 
-# Installe les outils système nécessaires :
-# - gcc : compilateur C (nécessaire pour certains packages Python)
-# - postgresql-client : pour communiquer avec PostgreSQL
-# - curl : pour faire des requêtes HTTP (utile pour les health checks)
-# rm -rf ... : nettoie le cache apt pour réduire la taille de l'image
+# curl est nécessaire pour les healthchecks Docker
+# libgomp1 est nécessaire pour LightGBM
 RUN apt-get update && apt-get install -y \
-    gcc \
-    postgresql-client \
     curl \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copie uv depuis son image officielle (multi-stage copy)
-# Ça évite d'installer uv manuellement
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+# Copie les packages Python compilés depuis le builder
+# C'est la clé du multi-stage : on récupère le résultat sans les outils
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Dit à uv d'utiliser le Python du système
-ENV UV_SYSTEM_PYTHON=1
-
-# Copie les fichiers de dépendances qui seront stockées en cache pour accélérer les builds suivants
-COPY pyproject.toml uv.lock ./
-
-# Installe les dépendances Python
-RUN uv pip install .
-
-# Copie le dossier backend/ local dans app/backend/ dans le conteneur
+# Copie le code source
 COPY backend/ ./backend/
 
-# Sécurité : crée un utilisateur non-root
-# Ne jamais faire tourner un conteneur en root en production
+# Sécurité : ne jamais faire tourner un conteneur en root en production
 RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
-
-# Change vers l'utilisateur non-root
 USER appuser
 
-# Documente le port exposé
 EXPOSE 8000
 
-# Lance l'API FastAPI
 # backend.app.main = chemin vers le fichier main.py
-# :app = l'objet FastAPI dans ce fichier
+# :app = l'objet FastAPI créé dans ce fichier
 CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
