@@ -1,6 +1,6 @@
 [project]
 name = "prediction-gravite-accidents"
-version = "0.1.0"
+version = "0.2.0"
 description = "Prédiction de la gravité des accidents de la route (BAAC) avec API FastAPI et UI Streamlit."
 readme = "README.md"
 requires-python = ">=3.10"

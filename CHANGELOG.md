@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.2.0 (2026-02-22)
+
+### Features
+
+- Add deliverables documentation and remove .vscode
+  ([#17](https://github.com/Minaanimmina/prediction-gravite-accidents-BAAC-data-docker/pull/17),
+  [`375d9c5`](https://github.com/Minaanimmina/prediction-gravite-accidents-BAAC-data-docker/commit/375d9c56f007022a94e7b5d360d3faa41bd6c20a))
+
+Co-authored-by: Mina Guinchard <mguinchard@afi-sa.fr>
+
+
 ## v0.1.0 (2026-02-21)
 
 ### Bug Fixes
