@@ -302,7 +302,7 @@ Pratiques de sécurité appliquées :
 |---------|-------------|
 | **Backend** | FastAPI, Uvicorn |
 | **Frontend** | Streamlit |
-| **ML** | CatBoost, scikit-learn, pandas |
+| **ML** | LightGBM, scikit-learn, pandas |
 | **BD** | PostgreSQL, SQLAlchemy |
 | **Validation** | Pydantic |
 | **Containerisation** | Docker, Docker Compose |
