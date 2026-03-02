@@ -8,7 +8,6 @@ WORKDIR /app
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 ENV UV_SYSTEM_PYTHON=1
 
-# Il manque ça :
 COPY pyproject.toml uv.lock ./
 RUN uv pip install .
 
