@@ -67,9 +67,9 @@ def predict(req: PredictionInput) -> dict[str, object]:
                     db_prediction = Prediction(
                         features_json=req.features,
                         prediction=pred_grav,
-                        proba_grav1=float(proba["grav_1"] if proba else 0.0), # type: ignore[arg-type]
-                        proba_grav2=float(proba["grav_2"] if proba else 0.0), # type: ignore[arg-type]
-                        proba_grav3=float(proba["grav_3"] if proba else 0.0), # type: ignore[arg-type]
+                        proba_grav1=float(proba["grav_1"] if proba else 0.0),  # type: ignore[arg-type]
+                        proba_grav2=float(proba["grav_2"] if proba else 0.0),  # type: ignore[arg-type]
+                        proba_grav3=float(proba["grav_3"] if proba else 0.0),  # type: ignore[arg-type]
                     )
                     db.add(db_prediction)
                     db.commit()

@@ -1,7 +1,7 @@
 # Veille : Observabilité & Monitoring — Prometheus, Grafana, PromQL
 
 > Réalisée dans le cadre du brief **Monitoring & Observabilité : Prometheus, Grafana et Stress Testing avec FastAPI**
-> 
+>
 
 ---
 
@@ -14,7 +14,7 @@
 **L'observabilité** est la capacité à comprendre l'état interne d'un système à partir des données qu'il produit (métriques, logs, traces). Elle répond à la question : *"Pourquoi est-ce que ça ne marche pas ?"*. Elle permet d'explorer et de diagnostiquer des problèmes **inconnus à l'avance**, notamment dans des architectures distribuées complexes.
 
 > Une formule pour retenir : *le monitoring te dit que quelque chose ne va pas, l'observabilité te dit quoi et pourquoi.*
-> 
+>
 
 ### Complémentarité
 
@@ -54,7 +54,7 @@ Des enregistrements horodatés d'événements discrets. Plus verbeux que les mé
 Une trace suit le cheminement complet d'une requête à travers les différents composants d'un système distribué (microservices, bases de données, files de messages). Essentielle pour identifier où se produisent les goulots d'étranglement.
 
 > Dans ce brief, on se concentre sur le **premier pilier : les métriques**, avec Prometheus comme collecteur et Grafana comme visualiseur.
-> 
+>
 
 ### Source
 
