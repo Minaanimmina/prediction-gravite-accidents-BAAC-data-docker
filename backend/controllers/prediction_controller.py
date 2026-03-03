@@ -1,117 +1,120 @@
 """Controleur pour gerer les predictions."""
 
 import logging
+import time
 
 import joblib
 import pandas as pd
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
+from ..metrics import (
+    db_query_duration_seconds,
+    history_requests_total,
+    http_errors_total,
+    prediction_confidence_histogram,
+    predictions_total,
+    update_uptime,
+)
 from ..models.prediction import Prediction
 from ..utils.config import MODEL_FEATURES, MODEL_PATH
 from ..utils.database import SessionLocal
 from ..utils.schemas import PredictionInput, PredictionResponse
 
-# Crée un routeur pour les endpoints de prédiction
 router = APIRouter(prefix="/api/predictions", tags=["predictions"])
 
-# Charge le modèle depuis le fichier
 model = joblib.load(MODEL_PATH)
-
-# Utilise les features définies dans config.py
 model_features = MODEL_FEATURES
 
 
-# Endpoint pour faire une prédiction
 @router.post("/predict")
 def predict(req: PredictionInput) -> dict[str, object]:
-    # Crée un tableau pandas contenant les features envoyées par l'utilisateur
-    X = pd.DataFrame([req.features])
+    update_uptime()
 
-    # Ajoute les features manquantes avec une valeur 0
-    # si l'utilisateur ne les a pas envoyées
-    for col in model_features:
-        if col not in X.columns:
-            X[col] = 0
+    try:
+        # Prépare les features
+        X = pd.DataFrame([req.features])
+        for col in model_features:
+            if col not in X.columns:
+                X[col] = 0
+        X = X[model_features]
 
-    # Garde uniquement les colonnes que le modèle attend, dans le bon ordre
-    X = X[model_features]
+        # Prédiction
+        pred = model.predict(X)[0]
+        pred_grav = int(pred) + 1
 
-    # Fait la prédiction avec le modèle
-    # pred sera 0, 1 ou 2
-    pred = model.predict(X)[0]
+        # Probabilités
+        proba = None
+        if hasattr(model, "predict_proba"):
+            p = model.predict_proba(X)[0]
+            proba = {
+                "grav_1": float(p[0]),
+                "grav_2": float(p[1]),
+                "grav_3": float(p[2]),
+            }
+            confidence = float(p[pred])
+            prediction_confidence_histogram.observe(confidence)
 
-    # Convertit la prédiction de 0/1/2 en 1/2/3
-    # (car c'est ce que les utilisateurs attendent)
-    pred_grav = int(pred) + 1
+        # Incrémente le counter APRÈS le succès
+        predictions_total.labels(predicted_gravity=str(pred_grav)).inc()
 
-    # Initialise la variable pour les probabilités
-    proba = None
-    # Si le modèle peut donner des probabilités (confiance dans sa prédiction)
-    if hasattr(model, "predict_proba"):
-        # Récupère les probabilités pour chaque classe
-        p = model.predict_proba(X)[0]  # ex: [p0, p1, p2]
-        # Les convertit en dictionnaire plus lisible
-        proba = {
-            "grav_1": float(p[0]),
-            "grav_2": float(p[1]),
-            "grav_3": float(p[2]),
-        }
-
-    # Enregistrer en BD (optionnel - ne bloque pas si BD indisponible)
-    # Étape A : Crée une session BD
-    if SessionLocal is not None:
-        try:
-            db = SessionLocal()
-
+        # Sauvegarde en BD avec mesure de latence
+        if SessionLocal is not None:
             try:
-                # Étape B : Crée une instance Prediction pour enregistrer
-                db_prediction = Prediction(
-                    features_json=req.features,
-                    prediction=pred_grav,
-                    proba_grav1=(proba["grav_1"] if proba else 0.0),  # type: ignore[arg-type]
-                    proba_grav2=(proba["grav_2"] if proba else 0.0),  # type: ignore[arg-type]
-                    proba_grav3=(proba["grav_3"] if proba else 0.0),  # type: ignore[arg-type]
-                )
+                db = SessionLocal()
+                try:
+                    start = time.time()
 
-                # Étape C : Ajoute à la BD
-                db.add(db_prediction)
+                    db_prediction = Prediction(
+                        features_json=req.features,
+                        prediction=pred_grav,
+                        proba_grav1=float(proba["grav_1"] if proba else 0.0),  # type: ignore[arg-type]
+                        proba_grav2=float(proba["grav_2"] if proba else 0.0),  # type: ignore[arg-type]
+                        proba_grav3=float(proba["grav_3"] if proba else 0.0),  # type: ignore[arg-type]
+                    )
+                    db.add(db_prediction)
+                    db.commit()
 
-                # Étape D : Valide
-                db.commit()
+                    db_query_duration_seconds.observe(time.time() - start)
 
-            finally:
-                # Étape E : Ferme la session
-                db.close()
-        except Exception as e:
-            # Si la BD n'est pas accessible, on continue quand même
-            # (utile en dev local ou si la BD est down)
-            logging.warning(f"Impossible de sauvegarder en BD: {e}")
-    else:
-        logging.info("Base de données non disponible - prédiction non sauvegardée")
+                finally:
+                    db.close()
+            except Exception as e:
+                logging.warning(f"Impossible de sauvegarder en BD: {e}")
+                http_errors_total.labels(error_type="server_error").inc()
+        else:
+            logging.info("Base de données non disponible - prédiction non sauvegardée")
 
-    # Retourne la prédiction et les probabilités au client
-    return {"prediction": pred_grav, "proba": proba}
+        return {"prediction": pred_grav, "proba": proba}
+
+    except ValueError as e:
+        http_errors_total.labels(error_type="validation").inc()
+        raise HTTPException(status_code=422, detail=str(e)) from e
+
+    except Exception as e:
+        http_errors_total.labels(error_type="server_error").inc()
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-# Endpoint pour récupérer l'historique de toutes les prédictions
 @router.get("/history")
 def get_history() -> list[PredictionResponse]:
-    # Vérifie si la base de données est disponible
+    update_uptime()
+    history_requests_total.inc()
+
     if SessionLocal is None:
         logging.warning("Base de données non disponible - retour d'un historique vide")
         return []
 
-    # Crée une session BD
     db = SessionLocal()
-
     try:
-        # Récupère toutes les prédictions depuis la table
-        # C'est l'équivalent de : SELECT * FROM predictions
+        start = time.time()
         predictions = db.query(Prediction).all()
+        db_query_duration_seconds.observe(time.time() - start)
 
-        # Convertit explicitement en PredictionResponse (Pydantic)
         return [PredictionResponse.model_validate(p) for p in predictions]
 
+    except Exception as e:
+        http_errors_total.labels(error_type="server_error").inc()
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
     finally:
-        # Ferme la session
         db.close()
