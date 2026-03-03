@@ -51,12 +51,10 @@ def predict(req: PredictionInput) -> dict[str, object]:
                 "grav_2": float(p[1]),
                 "grav_3": float(p[2]),
             }
-            # On observe la probabilité de la classe prédite (confiance du modèle)
             confidence = float(p[pred])
             prediction_confidence_histogram.observe(confidence)
 
-        # Incrémente le counter APRÈS le succès — bonne pratique !
-        # Le label correspond à la gravité prédite
+        # Incrémente le counter APRÈS le succès
         predictions_total.labels(predicted_gravity=str(pred_grav)).inc()
 
         # Sauvegarde en BD avec mesure de latence
@@ -64,19 +62,19 @@ def predict(req: PredictionInput) -> dict[str, object]:
             try:
                 db = SessionLocal()
                 try:
-                    start = time.time()  # début du chrono BD
+                    start = time.time()
 
                     db_prediction = Prediction(
                         features_json=req.features,
                         prediction=pred_grav,
-                        proba_grav1=(proba["grav_1"] if proba else 0.0),
-                        proba_grav2=(proba["grav_2"] if proba else 0.0),
-                        proba_grav3=(proba["grav_3"] if proba else 0.0),
+                        proba_grav1=float(proba["grav_1"] if proba else 0.0),
+                        proba_grav2=float(proba["grav_2"] if proba else 0.0),
+                        proba_grav3=float(proba["grav_3"] if proba else 0.0),
                     )
                     db.add(db_prediction)
                     db.commit()
 
-                    db_query_duration_seconds.observe(time.time() - start)  # fin chrono
+                    db_query_duration_seconds.observe(time.time() - start)
 
                 finally:
                     db.close()
@@ -89,21 +87,17 @@ def predict(req: PredictionInput) -> dict[str, object]:
         return {"prediction": pred_grav, "proba": proba}
 
     except ValueError as e:
-        # Erreur de validation des données d'entrée
         http_errors_total.labels(error_type="validation").inc()
-        raise HTTPException(status_code=422, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e)) from e
 
     except Exception as e:
-        # Erreur serveur inattendue
         http_errors_total.labels(error_type="server_error").inc()
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/history")
 def get_history() -> list[PredictionResponse]:
     update_uptime()
-
-    # Incrémente le counter de consultation d'historique
     history_requests_total.inc()
 
     if SessionLocal is None:
@@ -120,7 +114,7 @@ def get_history() -> list[PredictionResponse]:
 
     except Exception as e:
         http_errors_total.labels(error_type="server_error").inc()
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
     finally:
         db.close()

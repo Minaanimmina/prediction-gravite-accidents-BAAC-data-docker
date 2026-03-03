@@ -1,6 +1,7 @@
 """Métriques Prometheus pour l'API de prédiction d'accidents."""
 
 import time
+
 from prometheus_client import Counter, Gauge, Histogram
 
 # --- Counters : événements cumulatifs (ne font que monter) ---

@@ -1,14 +1,13 @@
 """Point d'entree de l'application API."""
 
 import logging
-import time
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from ..controllers.prediction_controller import router as prediction_router
-from ..metrics import app_uptime_seconds, update_uptime
+from ..metrics import update_uptime
 from ..utils.database import init_db
 
 logging.basicConfig(level=logging.INFO)
