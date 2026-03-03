@@ -39,11 +39,21 @@ prediction-gravite-accidents-BAAC-data-docker/
 │       ├── config.py
 │       ├── database.py
 │       └── schemas.py
+├── docs/
+│   └── DASHBOARD_DESIGN.md
 ├── frontend/                      # Interface Streamlit
 │   ├── Dockerfile
 │   └── streamlit_app.py
+├── monitoring/
+│   ├── prometheus.yml             # Configuration Prometheus
+│   └── dashboards/                # Dashboards Grafana (JSON)
 ├── tests/
 │   └── test_api.py
+├── veille/
+│   ├── COMPARATIF_OUTILS.md
+│   ├── PROBLEMES_DETECTES.md
+│   ├── VEILLE_CICD.md
+│   └── VEILLE_OBSERVABILITE.md
 └── .github/workflows/
     ├── ci.yml                     # Lint, type-check, sécurité, tests
     ├── build.yml                  # Build/push images Docker vers GHCR
@@ -105,11 +115,15 @@ docker-compose up --build
 ### 4) Accéder aux services
 
 | Service | URL |
-|---------|-----|
+| --------- | ----- |
 | **API** | http://127.0.0.1:8000 |
 | **API Docs** | http://127.0.0.1:8000/docs |
 | **Streamlit** | http://127.0.0.1:8501 |
 | **PostgreSQL** | localhost:5432 |
+| **Prometheus** | http://localhost:9090 |
+| **Grafana** | http://localhost:3000 |
+| **node-exporter** | http://localhost:9100 |
+| **cAdvisor** | http://localhost:8080 |
 
 ---
 
@@ -267,6 +281,20 @@ GET /history
 
 Documentation interactive : **http://127.0.0.1:8000/docs**
 
+## Monitoring & Observabilité
+
+La stack de monitoring comprend :
+
+- **Prometheus** : collecte des métriques (scraping toutes les 15s)
+- **Grafana** : visualisation (login: admin/admin)
+- **node-exporter** : métriques système (CPU, RAM, réseau, disque)
+- **cAdvisor** : métriques par container Docker
+
+Dashboards disponibles :
+
+- **HTTP Overview** : requêtes/sec, latence P95, taux d'erreur, CPU, RAM
+- **ML Model Performance** : prédictions, répartition gravités, confidence modèle
+
 ## CI/CD et versioning
 
 Le projet s'appuie sur **GitHub Actions** pour automatiser les contrôles qualité, le build et les releases :
@@ -299,10 +327,10 @@ Pratiques de sécurité appliquées :
 ## Technologies utilisées
 
 | Domaine | Technologie |
-|---------|-------------|
+| --------- | ------------- |
 | **Backend** | FastAPI, Uvicorn |
 | **Frontend** | Streamlit |
-| **ML** | CatBoost, scikit-learn, pandas |
+| **ML** | LightGBM, scikit-learn, pandas |
 | **BD** | PostgreSQL, SQLAlchemy |
 | **Validation** | Pydantic |
 | **Containerisation** | Docker, Docker Compose |
@@ -335,4 +363,4 @@ MIT License
 
 ---
 
-*Dernière mise à jour : 21 février 2026*
+*Dernière mise à jour : 03 mars 2026*
