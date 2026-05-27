@@ -29,7 +29,8 @@ app.add_middleware(
 
 # --- Prometheus : expose /metrics automatiquement ---
 # Ajoute les métriques HTTP standards : nb requêtes, latence, status codes
-Instrumentator().instrument(app).expose(app)
+instrumentator = Instrumentator()
+instrumentator.instrument(app).expose(app)
 
 try:
     init_db()
