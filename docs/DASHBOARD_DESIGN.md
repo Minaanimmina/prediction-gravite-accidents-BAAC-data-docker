@@ -14,8 +14,13 @@
 | Total requêtes | Gauge | `sum(http_requests_total)` | Vue rapide du volume global depuis le démarrage. |
 | CPU Usage % | Time series | `node_cpu_seconds_total` | Tendance CPU dans le temps pour détecter les dérives. |
 | RAM Usage % | Gauge | `node_memory_MemAvailable_bytes` | Valeur instantanée avec seuils : orange à 70%, rouge à 90%. |
+| Uptime | Stat | `app_uptime_seconds` | Valeur instantanée → Stat. Confirme que l'app n'a pas redémarré pendant les tests de charge. |
+| Débit instantané (req/s) | Stat | `sum(rate(http_requests_total[30s]))` | Fenêtre courte pour une valeur très réactive. Utile pendant les tests Locust pour voir le débit en temps réel. |
+| Requêtes par route | Time series | `sum by (handler) (rate(http_requests_total[1m]))` | Ventilation du trafic par endpoint. Permet d'identifier quel endpoint est le plus sollicité sous charge. |
+| Latence P50/P95/P99 | Time series | `histogram_quantile(0.50/0.95/0.99, ...)` | Trois percentiles sur le même panel pour observer l'écartement sous charge. Un P99 qui explose sans que le P50 bouge indique des cas isolés lents. |
+| Latence P95 par route | Time series | `histogram_quantile(0.95, sum by (le, handler) (...))` | Comparaison de la dégradation par endpoint sous charge. Permet d'identifier si `/predict` ou `/history` souffre le plus. |
 
-**Approche** : RED (Rate, Errors, Duration) + infrastructure.
+**Approche** : RED (Rate, Errors, Duration) + infrastructure + stress testing.
 
 ---
 
