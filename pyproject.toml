@@ -36,7 +36,8 @@ dev = [
     "safety",
     "httpx",
     "pre-commit",
-    "python-semantic-release"
+    "python-semantic-release",
+    "locust>=2.44.0",
 ]
 
 [tool.ruff]

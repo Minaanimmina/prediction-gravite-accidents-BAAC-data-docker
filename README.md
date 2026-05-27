@@ -58,6 +58,7 @@ prediction-gravite-accidents-BAAC-data-docker/
 ├── docs/
 │   ├── DASHBOARD_DESIGN.md        # Justification des choix de dashboards Grafana
 │   ├── dashboards_grafana_screenshots/  # Captures des dashboards Grafana (Phase 3)
+│   ├── locust_screenshots/  # Captures des tests Locust (Phase 4)
 │   ├── prometheus_screenshots/    # Captures Prometheus : targets UP, requêtes PromQL (Phase 2)
 │   └── veille/                    # Documents de veille technologique
 │       ├── COMPARATIF_OUTILS.md
@@ -253,7 +254,7 @@ GET /health
 ### Créer une prédiction
 
 ```bash
-POST /predict
+POST /api/predictions/predict
 
 # Body :
 {
@@ -278,7 +279,7 @@ POST /predict
 ### Consulter l'historique
 
 ```bash
-GET /history
+GET /api/predictions/history
 
 # Réponse : liste des prédictions enregistrées
 [
@@ -301,14 +302,36 @@ Documentation interactive : **http://127.0.0.1:8000/docs**
 La stack de monitoring comprend :
 
 - **Prometheus** : collecte des métriques (scraping toutes les 15s)
-- **Grafana** : visualisation (login: admin/admin)
+- **Grafana** : visualisation (login: admin/admin par défaut)
 - **node-exporter** : métriques système (CPU, RAM, réseau, disque)
 - **cAdvisor** : métriques par container Docker
+- **Locust** : tests de charge (interface sur http://localhost:8089)
 
 Dashboards disponibles :
 
-- **HTTP Overview** : requêtes/sec, latence P95, taux d'erreur, CPU, RAM
-- **ML Model Performance** : prédictions, répartition gravités, confidence modèle
+- **HTTP Overview** : requêtes/sec, latence P50/P95/P99, taux d'erreur, requêtes par route, latence par route, CPU, RAM, uptime, débit instantané
+- **ML Model Performance** : prédictions, répartition gravités, confiance modèle, latence BD, réseau, RAM par container
+
+### Résultats des tests de charge (Locust)
+
+| Métrique | 20 users | 100 users | 200 users |
+|----------|----------|-----------|-----------|
+| RPS | 8.2 | 39.7 | 53.8 |
+| Taux d'erreurs % | 0% | 0.01% | 0.007% |
+| Latence médiane ms | 5 | 4 | 4 |
+| Latence P95 ms | 11 | 13 | 11 |
+| Latence P99 ms | 15 | 23 | 34 |
+| CPU hôte % | 13.2% | 10.54% | 13.87% |
+| RAM hôte % | 20.2% | 19% | 20.4% |
+
+L'API reste stable jusqu'à 200 users simultanés sans dégradation significative. Le point de rupture n'a pas été atteint dans les paliers testés.
+
+### Lancer les tests de charge
+
+```bash
+uv run locust -f locustfile.py --host http://localhost:8000
+# Puis ouvrir http://localhost:8089
+```
 
 ## CI/CD et versioning
 
@@ -350,6 +373,16 @@ Pratiques de sécurité appliquées :
 | **Validation** | Pydantic |
 | **Containerisation** | Docker, Docker Compose |
 | **Environnement** | Python 3.13 + uv |
+| **Monitoring** | Prometheus, Grafana, Locust, node-exporter, cAdvisor |
+
+## Limitations connues
+
+### Métriques cAdvisor sur WSL2
+Sur WSL2, cAdvisor n'expose pas le label `name` pour identifier les containers Docker. Les containers sont identifiés par leur hash d'ID (`/docker/<hash>`). Le panel "RAM par container" utilise donc des hashes comme identifiants plutôt que des noms lisibles.
+Ce comportement est attendu et documenté sur les environnements WSL2. En production sur Linux natif, le label `name` est disponible et les containers s'affichent avec leur nom complet.
+
+### Modèle ML versionné dans Git
+Le fichier `best_model_multiclass.joblib` est versionné directement dans Git. C'est acceptable pour un projet de formation mais en production il faudrait utiliser un registre de modèles dédié (MLflow, DVC, S3) pour éviter d'alourdir le repo avec des fichiers binaires.
 
 ## Données
 
@@ -378,4 +411,4 @@ MIT License
 
 ---
 
-*Dernière mise à jour : 03 mars 2026*
+*Dernière mise à jour : 27 mai 2026*
