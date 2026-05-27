@@ -4,7 +4,6 @@ import random
 
 from locust import HttpUser, between, task
 
-
 SAMPLE_FEATURES = {
     "acc_est_en_agglo": 1,
     "intersection": 0,
