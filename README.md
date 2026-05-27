@@ -25,39 +25,54 @@ Le modèle est entraîné sur les données **BAAC de l'ONISR** (2022-2024), puis
 
 ```ascii
 prediction-gravite-accidents-BAAC-data-docker/
-├── docker-compose.yml             # Orchestration des conteneurs
-├── pyproject.toml                 # Dépendances Python
+├── .dockerignore
 ├── .env.example                   # Variables d'environnement d'exemple
+├── .gitignore
+├── .pre-commit-config.yaml        # Hooks pre-commit (lint, format, sécurité)
+├── .github/
+│   └── workflows/
+│       ├── ci.yml                 # Lint, type-check, sécurité, tests
+│       ├── build.yml              # Build/push images Docker vers GHCR
+│       └── release.yml            # Release sémantique automatique
+├── CHANGELOG.md                   # Historique des versions (généré par semantic-release)
+├── docker-compose.yml             # Orchestration des conteneurs
+├── pyproject.toml                 # Dépendances Python et configuration des outils
 ├── README.md                      # Documentation du projet
+├── uv.lock                        # Versions verrouillées des dépendances
 ├── backend/                       # API FastAPI
-│   ├── Dockerfile
-│   ├── app/main.py                # Endpoints FastAPI (predict, health, history)
-│   ├── controllers/prediction_controller.py
-│   ├── data/models/best_model_multiclass.joblib
-│   ├── models/prediction.py       # Modèle SQLAlchemy des prédictions
+│   ├── Dockerfile                 # Image Docker multi-stage de l'API
+│   ├── metrics.py                 # Définition des métriques Prometheus custom
+│   ├── app/
+│   │   └── main.py                # Point d'entrée FastAPI (middlewares, routing, Prometheus)
+│   ├── controllers/
+│   │   └── prediction_controller.py  # Endpoints predict et history
+│   ├── data/
+│   │   └── models/
+│   │       └── best_model_multiclass.joblib  # Modèle LightGBM entraîné
+│   ├── models/
+│   │   └── prediction.py          # Modèle SQLAlchemy des prédictions
 │   └── utils/
-│       ├── config.py
-│       ├── database.py
-│       └── schemas.py
+│       ├── config.py              # Chemins et features du modèle
+│       ├── database.py            # Session SQLAlchemy et init DB
+│       └── schemas.py             # Schémas Pydantic (entrées/sorties API)
 ├── docs/
-│   └── DASHBOARD_DESIGN.md
+│   ├── DASHBOARD_DESIGN.md        # Justification des choix de dashboards Grafana
+│   ├── dashboards_grafana_screenshots/  # Captures des dashboards Grafana (Phase 3)
+│   ├── prometheus_screenshots/    # Captures Prometheus : targets UP, requêtes PromQL (Phase 2)
+│   └── veille/                    # Documents de veille technologique
+│       ├── COMPARATIF_OUTILS.md
+│       ├── PROBLEMES_DETECTES.md
+│       ├── VEILLE_CICD.md
+│       └── VEILLE_OBSERVABILITE.md
 ├── frontend/                      # Interface Streamlit
 │   ├── Dockerfile
 │   └── streamlit_app.py
 ├── monitoring/
-│   ├── prometheus.yml             # Configuration Prometheus
-│   └── dashboards/                # Dashboards Grafana (JSON)
+│   ├── prometheus.yml             # Configuration Prometheus (scrape jobs)
+│   └── dashboards_json/           # Dashboards Grafana exportés en JSON
 ├── tests/
+│   ├── __init__.py
 │   └── test_api.py
-├── veille/
-│   ├── COMPARATIF_OUTILS.md
-│   ├── PROBLEMES_DETECTES.md
-│   ├── VEILLE_CICD.md
-│   └── VEILLE_OBSERVABILITE.md
-└── .github/workflows/
-    ├── ci.yml                     # Lint, type-check, sécurité, tests
-    ├── build.yml                  # Build/push images Docker vers GHCR
-    └── release.yml                # Release sémantique automatique
 ```
 
 ## Prérequis
