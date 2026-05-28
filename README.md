@@ -1,5 +1,16 @@
 # Prédiction de la Gravité des Accidents de la Route
 
+![Python](https://img.shields.io/badge/python-3.13-blue?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-API%20REST-009688?logo=fastapi&logoColor=white)
+![LightGBM](https://img.shields.io/badge/LightGBM-ML%20model-green?logo=python&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-containerisation-2496ED?logo=docker&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-monitoring-E6522C?logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-dashboards-F46800?logo=grafana&logoColor=white)
+![Locust](https://img.shields.io/badge/Locust-stress%20testing-4caf50)
+![uv](https://img.shields.io/badge/uv-package%20manager-7C3AED)
+![Dataset](https://img.shields.io/badge/Dataset-BAAC%20ONISR%202022--2024-blue)
+
 ## Description du projet
 
 Ce projet prédit la **gravité d'un accident de la route** à partir de ses circonstances (lieu, heure, conditions météo, type de route, etc.).
